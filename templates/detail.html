@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Post content-->
+            <article>
+                <!-- Post header-->
+                <header class="mb-4">
+                    <!-- Post title-->
+                    <h1 class="fw-bolder mb-1">{{ article.title }}</h1>
+                    
+                    <!-- Post meta content-->
+                    <div class="text-muted fst-italic mb-2">
+                        Bu makale {{ article.created_date }} tarihinde {{ article.author }} tarafından yayınlanmıştır.
+                    </div>
+                    
+                    <!-- Post categories-->
+                    <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
+                    <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
+                </header>
+
+                <!-- Preview image figure-->
+                {% if article.article_image %}
+                    {% with article.article_image.name|lower as filename %}
+                        {% if ".pdf" in filename %}
+                            <iframe src="{{ article.article_image.url }}" width="100%" height="600px" style="border: none;"></iframe>
+                            <br>
+                        {% elif ".jpg" in filename or ".jpeg" in filename or ".png" in filename or ".gif" in filename %}
+                            <img class="img-fluid rounded" src="{{ article.article_image.url }}" alt="Görsel" />
+                            <br>
+                        {% elif ".doc" in filename or ".docx" in filename %}
+                            <p>Word dosyası: 
+                                <a href="{{ article.article_image.url }}" target="_blank">Görüntüle / İndir</a>
+                            </p>
+                            <br>
+                        {% elif ".ppt" in filename or ".pptx" in filename %}
+                            <p>Sunum dosyası: 
+                                <a href="{{ article.article_image.url }}" target="_blank">Görüntüle / İndir</a>
+                            </p>
+                            <br>
+                        {% elif ".mp4" in filename or ".webm" in filename or ".ogg" in filename %}
+                            <video width="100%" height="auto" controls>
+                                <source src="{{ article.article_image.url }}">
+                                Tarayıcınız video oynatmayı desteklemiyor.
+                            </video>
+                            <br>
+                        {% else %}
+                            <p>Dosya: 
+                                <a href="{{ article.article_image.url }}" target="_blank">İndir (önizleme yok)</a>
+                            </p>
+                            <br>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+                <br>
+                <!-- Post content-->
+                <section class="mb-5">
+                    {{ article.content|safe }}
+                </section>
+            </article>
+            
+            <!--Comment Kısmı-->
+            {% if comments %}
+                <h4>Yorumlar:</h4>
+                {% for comment in comments %}
+                    <!-- Yorumların gösterilme alanı -->
+                    <section class="mb-1">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                    <div class="ms-3">
+                                        <div class="fw-bold">{{comment.comment_author}}</div>
+                                        {{comment.comment_date|date:"d.m.Y"}}
+                                        <br>
+                                        {{comment.comment_content}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% endfor %}
+                <br>
+                <br>
+                <!-- Yorum yapma alanı-->
+                <section class="mb-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <form class="mb-4" method="post" action="{% url 'article:comment' article.id %}">
+                                {% csrf_token %}
+                                <h4 class="mb-3">Yorum Ekle:</h4>
+                                <input name="comment_author" type="text" class="form-control mb-3 rounded-3 shadow-sm" placeholder="İsminizi giriniz!" aria-label="isim">
+                                <textarea name="comment_content" class="form-control mb-3 rounded-3 shadow-sm" rows="4" placeholder="Yorumunu bu kısma yazabilirsin!"></textarea>
+                                <button type="submit" class="btn btn-primary">Yorumla</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            {% else %}
+                <!-- Yorum hiç yoksa -->
+                <section class="mb-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <form class="mb-4" method="post" action="{% url 'article:comment' article.id %}">
+                                {% csrf_token %}
+                                <h4 class="mb-3">Yorum Ekle:</h4>
+                                <input name="comment_author" type="text" class="form-control mb-3 rounded-3 shadow-sm" placeholder="İsminizi giriniz!" aria-label="isim">
+                                <textarea name="comment_content" class="form-control mb-3 rounded-3 shadow-sm" rows="4" placeholder="Yorumunu bu kısma yazabilirsin!"></textarea>
+                                <button type="submit" class="btn btn-primary">Yorumla</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

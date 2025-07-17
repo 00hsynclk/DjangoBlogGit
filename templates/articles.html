@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-8">
+      <h3>Makaleler</h3>
+      <hr>
+    </div>
+  </div>
+</div>
+
+{% if articles %}
+    {% for article in articles %}
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- her bir makale buradan başlıyor -->
+                    <article>
+                        <header class="mb-4">
+                            <a href="{% url 'article:detail' article.id %}" class="text-decoration-none text-reset"><h1 class="fw-bolder mb-1">{{ article.title }}</h1></a>
+                            <div class="text-muted fst-italic mb-2">
+                                Bu makale {{ article.created_date }} tarihinde {{ article.author }} tarafından yayınlanmıştır.
+                            </div>
+                        </header>
+                        {% if article.article_image %}
+                            {% with article.article_image.name|lower as filename %}
+                                {% if ".pdf" in filename %}
+                                    <iframe src="{{ article.article_image.url }}" width="100%" height="600px" style="border: none;"></iframe>
+                                    <br>
+                                {% elif ".jpg" in filename or ".jpeg" in filename or ".png" in filename or ".gif" in filename %}
+                                    <img class="img-fluid rounded" src="{{ article.article_image.url }}" alt="Görsel" />
+                                    <br>
+                                {% elif ".doc" in filename or ".docx" in filename %}
+                                    <p>Word dosyası: <a href="{{ article.article_image.url }}" target="_blank">Görüntüle / İndir</a></p>
+                                    <br>
+                                {% elif ".ppt" in filename or ".pptx" in filename %}
+                                    <p>Sunum dosyası: <a href="{{ article.article_image.url }}" target="_blank">Görüntüle / İndir</a></p>
+                                    <br>
+                                {% elif ".mp4" in filename or ".webm" in filename or ".ogg" in filename %}
+                                    <video width="100%" height="auto" controls>
+                                        <source src="{{ article.article_image.url }}">
+                                        Tarayıcınız video oynatmayı desteklemiyor.
+                                    </video>
+                                    <br>
+                                {% else %}
+                                    <p>Dosya: <a href="{{ article.article_image.url }}" target="_blank">İndir (önizleme yok)</a></p>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <br>
+                        <section class="mb-5">
+                            {{ article.content|safe|truncatewords:50 }}
+                        </section>
+
+                        {% if article.content|wordcount > 50 %}
+                            <a href="/articles/article/{{ article.id }}" class="btn btn-success">Devamını Göster</a>
+                            <br>
+                        {% else %}
+                            <a href="/articles/article/{{ article.id }}" class="btn btn-success">Yorumları Göster</a>
+                            <br>
+                        {% endif %}
+                    </article>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-danger">
+        Bu blogda herhangi bir makale bulunmuyor.
+        Eklemek istermisin?
+        <br><br>
+        <a href="articles/addArticle" class="btn btn-info">Makale Ekle</a>
+    </div>
+{% endif %}
+
+{% endblock body %}
